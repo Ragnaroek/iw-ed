@@ -6,11 +6,9 @@ function App(props) {
 
   function onFileChange(e) {
     let reader = new FileReader();
-    reader.onloadend = () => {
-      
-      //let v = new Uint8Array(reader.result);
-
-      let r = wasm.load_map_offsets(reader.result);
+    reader.onloadend = () => {      
+      let v = new Uint8Array(reader.result);
+      let r = wasm.load_map_offsets(v);
       console.log(r);
     };
     reader.readAsArrayBuffer(e.target.files[0]);
@@ -22,10 +20,10 @@ function App(props) {
   function buildGrid() {
     let result = [];
     for(let x=0;x<=64;x++) {
-      result.push(<Line points={[x*gridWidth, 0, x*gridWidth, dim]} strokeWidth={1} stroke="black" />);
+      result.push(<Line points={[x*gridWidth, 0, x*gridWidth, dim]} strokeWidth={1} stroke="#f2f2f2" />);
     }
     for(let y=0;y<=64;y++) {
-      result.push(<Line points={[0, y*gridWidth, dim, y*gridWidth]} strokeWidth={1} stroke="black" />);
+      result.push(<Line points={[0, y*gridWidth, dim, y*gridWidth]} strokeWidth={1} stroke="#f2f2f2" />);
     }
     return result;
   }
