@@ -11,7 +11,10 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
+import CssBaseline from "@mui/material/CssBaseline";
 import { Stage, Layer, Line, Rect, Text } from "react-konva";
+import { EditorDetailView } from "./EditorDetailView";
+import { Store, TileSelection } from "./state";
 
 const drawerWidth = 240;
 
@@ -55,7 +58,8 @@ function App(props: any) {
   const gridWidth = dim / 64;
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
       <AppBar
         position="fixed"
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -100,7 +104,15 @@ function App(props: any) {
         </Box>
       </Drawer>
 
-      <div>
+      {/* TODO find a better way than marginTop to position the main elements under the nav bar*/}
+      <Box
+        component="main"
+        sx={{
+          bgcolor: "background.default",
+          p: 3,
+          marginTop: "60px",
+        }}
+      >
         <Stage width={dim} height={dim}>
           <Layer>{buildGrid(gridWidth, dim)}</Layer>
           <Layer>{buildWallPlane(gridWidth, map)}</Layer>
@@ -110,7 +122,10 @@ function App(props: any) {
         <div>
           <input type="file" onChange={onFileChange} multiple />
         </div>
-      </div>
+      </Box>
+      <Box sx={{ minWidth: "30%", marginTop: "80px" }}>
+        <EditorDetailView />
+      </Box>
     </Box>
   );
 }
@@ -152,7 +167,6 @@ function buildInfoPlane(gridWidth: number, map: any) {
       let tile = map.segs[1][ptr];
 
       if (tile === 19 || tile === 20 || tile === 21 || tile === 22) {
-        //solid wall tile
         result.push(
           <Text
             key={x + "|" + y}
@@ -191,6 +205,7 @@ function buildWallPlane(gridWidth: number, map: any) {
             y={y * gridWidth}
             width={gridWidth}
             height={gridWidth}
+            onClick={() => Store.set({ tileSelected: { tileNum: tile } })}
           />
         );
       }
