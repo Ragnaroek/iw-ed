@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
 import ImageIcon from "@mui/icons-material/Image";
+import TextureIcon from "@mui/icons-material/Texture";
 import Drawer from "@mui/material/Drawer";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -14,25 +15,28 @@ import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Stage, Layer, Line, Rect, Text } from "react-konva";
 import { EditorDetailView } from "./EditorDetailView";
-import { Store, TileSelection } from "./state";
+import { useSub, Store } from "./state";
 
 const drawerWidth = 240;
 
 function App(props: any) {
-  const [map, setMap] = useState();
+  const { editorState } = useSub(({ editorState }) => ({ editorState }));
 
   let wasm = props.wasm;
 
   function onFileChange(e: any) {
     let files = e.target.files;
-    let headerFile;
+    let headerFile: any;
     let mapFile: any;
+    let gameDataFile: any;
 
     for (let i = 0; i < e.target.files.length; i++) {
       if (files[i].name === "GAMEMAPS.WL6") {
         mapFile = files[i];
       } else if (files[i].name === "MAPHEAD.WL6") {
         headerFile = files[i];
+      } else if (files[i].name === "VSWAP.WL6") {
+        gameDataFile = files[i];
       }
     }
 
@@ -46,12 +50,31 @@ function App(props: any) {
         let mapData = new Uint8Array(mapReader.result as ArrayBuffer);
         let headers = wasm.load_map_headers(mapData, offsets);
         let map0 = wasm.load_map(mapData, headers, offsets, 0);
-        setMap(map0);
+
+        Store.set(({ assets }) => {
+          assets.mapOffsets = offsets;
+          assets.mapHeaders = headers;
+          assets.mapData = mapData;
+        });
+
+        Store.set(({ editorState }) => ({
+          editorState: { ...editorState, map: map0 },
+        }));
       };
       mapReader.readAsArrayBuffer(mapFile);
     };
-
     headerReader.readAsArrayBuffer(headerFile);
+
+    let gameDataReader = new FileReader();
+    gameDataReader.onloadend = () => {
+      let gameData = new Uint8Array(gameDataReader.result as ArrayBuffer);
+      let headers = wasm.load_gamedata_headers(gameData);
+      Store.set(({ assets }) => {
+        assets.gameData = gameData;
+        assets.gameDataHeaders = headers;
+      });
+    };
+    gameDataReader.readAsArrayBuffer(gameDataFile);
   }
 
   const dim = Math.min(window.innerWidth, window.innerHeight);
@@ -100,6 +123,14 @@ function App(props: any) {
                 <ListItemText primary={"Graphics"} />
               </ListItemButton>
             </ListItem>
+            <ListItem key={"texsprites"} disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <TextureIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Textures/Sprites"} />
+              </ListItemButton>
+            </ListItem>
           </List>
         </Box>
       </Drawer>
@@ -115,8 +146,8 @@ function App(props: any) {
       >
         <Stage width={dim} height={dim}>
           <Layer>{buildGrid(gridWidth, dim)}</Layer>
-          <Layer>{buildWallPlane(gridWidth, map)}</Layer>
-          <Layer>{buildInfoPlane(gridWidth, map)}</Layer>
+          <Layer>{buildWallPlane(gridWidth, editorState.map)}</Layer>
+          <Layer>{buildInfoPlane(gridWidth, editorState.map)}</Layer>
         </Stage>
 
         <div>
@@ -205,7 +236,16 @@ function buildWallPlane(gridWidth: number, map: any) {
             y={y * gridWidth}
             width={gridWidth}
             height={gridWidth}
-            onClick={() => Store.set({ tileSelected: { tileNum: tile } })}
+            onClick={() =>
+              Store.set(({ editorState }) => {
+                return {
+                  editorState: {
+                    ...editorState,
+                    tileSelected: { tileNum: tile },
+                  },
+                };
+              })
+            }
           />
         );
       }
