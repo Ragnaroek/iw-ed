@@ -1,9 +1,9 @@
 import { useSub } from "./state";
 
 export const EditorDetailView = () => {
-  const { editorState } = useSub(({ editorState }) => ({ editorState }));
-  if (!editorState.tileSelected) {
+  const { tileSelected } = useSub(({ tileSelected }) => ({ tileSelected }));
+  if (!tileSelected) {
     return <div>Nothing selected</div>;
   }
-  return <div>Tile: {editorState.tileSelected.tileNum}</div>;
+  return <div>Tile: {tileSelected.tileNum}</div>;
 };

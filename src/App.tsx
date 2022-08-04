@@ -20,7 +20,7 @@ import { useSub, Store } from "./state";
 const drawerWidth = 240;
 
 function App(props: any) {
-  const { editorState } = useSub(({ editorState }) => ({ editorState }));
+  const { map } = useSub(({ map }) => ({ map })); //TODO Move do Editor component
 
   let wasm = props.wasm;
 
@@ -57,8 +57,8 @@ function App(props: any) {
           assets.mapData = mapData;
         });
 
-        Store.set(({ editorState }) => ({
-          editorState: { ...editorState, map: map0 },
+        Store.set(({ map }) => ({
+          map: map0,
         }));
       };
       mapReader.readAsArrayBuffer(mapFile);
@@ -79,7 +79,7 @@ function App(props: any) {
 
   const dim = Math.min(window.innerWidth, window.innerHeight);
   const gridWidth = dim / 64;
-
+  console.log("### map rerendering!!");
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -146,8 +146,8 @@ function App(props: any) {
       >
         <Stage width={dim} height={dim}>
           <Layer>{buildGrid(gridWidth, dim)}</Layer>
-          <Layer>{buildWallPlane(gridWidth, editorState.map)}</Layer>
-          <Layer>{buildInfoPlane(gridWidth, editorState.map)}</Layer>
+          <Layer>{buildWallPlane(gridWidth, map)}</Layer>
+          <Layer>{buildInfoPlane(gridWidth, map)}</Layer>
         </Stage>
 
         <div>
@@ -237,14 +237,11 @@ function buildWallPlane(gridWidth: number, map: any) {
             width={gridWidth}
             height={gridWidth}
             onClick={() =>
-              Store.set(({ editorState }) => {
-                return {
-                  editorState: {
-                    ...editorState,
-                    tileSelected: { tileNum: tile },
-                  },
-                };
-              })
+              Store.set(({ tileSelected }) => ({
+                tileSelected: {
+                  tileNum: tile,
+                },
+              }))
             }
           />
         );

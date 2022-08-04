@@ -11,12 +11,17 @@ export type Assets = {
 };
 
 export type TileSelection = { tileNum: number };
-export type EditorState = {
+
+type State = {
+  assets: Assets;
+  //editor state
   map?: any; //TODO better type here
   tileSelected?: TileSelection;
 };
-
-type State = { assets: Assets; editorState: EditorState };
-const initialState: State = { assets: {}, editorState: {} };
+const initialState: State = {
+  assets: {},
+  map: undefined,
+  tileSelected: undefined,
+};
 
 export const [useSub, Store] = createStore(initialState);
