@@ -79,7 +79,6 @@ function App(props: any) {
 
   const dim = Math.min(window.innerWidth, window.innerHeight);
   const gridWidth = dim / 64;
-  console.log("### map rerendering!!");
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -155,7 +154,7 @@ function App(props: any) {
         </div>
       </Box>
       <Box sx={{ minWidth: "30%", marginTop: "80px" }}>
-        <EditorDetailView />
+        <EditorDetailView wasm={wasm} />
       </Box>
     </Box>
   );
