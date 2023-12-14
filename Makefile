@@ -1,11 +1,11 @@
 run:
-	npm run start
+	pnpm run start
 
 clean:
 	rm -rf build/
 
 build:
-	npm run build
+	pnpm run build
 
 deploy: build
-	npm run deploy
+	pnpm run deploy

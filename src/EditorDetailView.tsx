@@ -3,7 +3,7 @@ import { useSub } from "./state";
 import { Texture } from "./Texture";
 
 export const EditorDetailView = (props: any) => {
-  const wasm = props.wasm;
+  const iw = props.iw;
   const { tileSelected, assets } = useSub(({ tileSelected, assets }) => ({
     tileSelected,
     assets,
@@ -15,11 +15,11 @@ export const EditorDetailView = (props: any) => {
 
   const headerVertical =
     assets.gameDataHeaders.headers[(tileSelected.tileNum - 1) * 2 + 1];
-  let textureDataVertical = wasm.load_texture(assets.gameData, headerVertical);
+  let textureDataVertical = iw.load_texture(assets.gameData, headerVertical);
 
   const headerHorizontal =
     assets.gameDataHeaders.headers[(tileSelected.tileNum - 1) * 2];
-  let textureDataHorizontal = wasm.load_texture(
+  let textureDataHorizontal = iw.load_texture(
     assets.gameData,
     headerHorizontal
   );
@@ -35,7 +35,7 @@ export const EditorDetailView = (props: any) => {
           Vertical:
         </Grid>
         <Grid item xs={9}>
-          <Texture wasm={wasm} textureData={textureDataVertical} />
+          <Texture iw={iw} textureData={textureDataVertical} />
         </Grid>
       </Grid>
 
@@ -44,7 +44,7 @@ export const EditorDetailView = (props: any) => {
           Horizontal:
         </Grid>
         <Grid item xs={9}>
-          <Texture wasm={wasm} textureData={textureDataHorizontal} />
+          <Texture iw={iw} textureData={textureDataHorizontal} />
         </Grid>
       </Grid>
     </Grid>

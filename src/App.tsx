@@ -22,7 +22,7 @@ const drawerWidth = 240;
 function App(props: any) {
   const { map } = useSub(({ map }) => ({ map })); //TODO Move do Editor component
 
-  let wasm = props.wasm;
+  let iw = props.iw;
 
   function onFileChange(e: any) {
     let files = e.target.files;
@@ -43,13 +43,13 @@ function App(props: any) {
     let headerReader = new FileReader();
     headerReader.onloadend = () => {
       let headerData = new Uint8Array(headerReader.result as ArrayBuffer);
-      let offsets = wasm.load_map_offsets(headerData);
+      let offsets = iw.load_map_offsets(headerData);
 
       let mapReader = new FileReader();
       mapReader.onloadend = () => {
         let mapData = new Uint8Array(mapReader.result as ArrayBuffer);
-        let headers = wasm.load_map_headers(mapData, offsets);
-        let map0 = wasm.load_map(mapData, headers, offsets, 0);
+        let headers = iw.load_map_headers(mapData, offsets);
+        let map0 = iw.load_map(mapData, headers, offsets, 0);
 
         Store.set(({ assets }) => {
           assets.mapOffsets = offsets;
@@ -68,7 +68,7 @@ function App(props: any) {
     let gameDataReader = new FileReader();
     gameDataReader.onloadend = () => {
       let gameData = new Uint8Array(gameDataReader.result as ArrayBuffer);
-      let headers = wasm.load_gamedata_headers(gameData);
+      let headers = iw.load_gamedata_headers(gameData);
       Store.set(({ assets }) => {
         assets.gameData = gameData;
         assets.gameDataHeaders = headers;
@@ -154,7 +154,7 @@ function App(props: any) {
         </div>
       </Box>
       <Box sx={{ minWidth: "30%", marginTop: "80px" }}>
-        <EditorDetailView wasm={wasm} />
+        <EditorDetailView iw={iw} />
       </Box>
     </Box>
   );

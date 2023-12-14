@@ -1,12 +1,13 @@
 import { useEffect, useRef } from "react";
+import { iw_start_web } from "./pkg/iw_bg.wasm";
 
-export type TextureProps = { wasm: any; textureData: any };
+export type TextureProps = { iw: any; textureData: any };
 
 const TEXTURE_WIDTH = 64;
 const TEXTURE_HEIGHT = 64;
 
 export const Texture = (props: TextureProps) => {
-  const wasm = props.wasm;
+  const iw = props.iw;
 
   const canvasRef = useRef(null);
 
@@ -26,7 +27,7 @@ export const Texture = (props: TextureProps) => {
         for (let x = 0; x < TEXTURE_WIDTH; x++) {
           for (let y = 0; y < TEXTURE_HEIGHT; y++) {
             const ix = 64 * y + x;
-            const color = wasm.gamepal_color(texture.bytes[ix]);
+            const color = iw.gamepal_color(texture.bytes[ix]);
             pixel[ix * 4 + 0] = color.r;
             pixel[ix * 4 + 1] = color.g;
             pixel[ix * 4 + 2] = color.b;
@@ -37,7 +38,7 @@ export const Texture = (props: TextureProps) => {
         context.putImageData(imageData, 0, 0);
       }
     }
-  }, [wasm, props.textureData]);
+  }, [iw, props.textureData]);
 
   return (
     <canvas
