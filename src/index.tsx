@@ -5,9 +5,7 @@ import App from './App';
 import init, * as iw from './pkg/iw.js';
 
 async function run() {
-
-  // TODO init iw with iw_init here and use the loader to load the data
-  // show placeholder until this is done
+  await init();
 
   const elem = document.getElementById('root');
   if (elem != null) {

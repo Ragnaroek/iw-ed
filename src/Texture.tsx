@@ -27,7 +27,8 @@ export const Texture = (props: TextureProps) => {
         for (let x = 0; x < TEXTURE_WIDTH; x++) {
           for (let y = 0; y < TEXTURE_HEIGHT; y++) {
             const ix = 64 * y + x;
-            const color = iw.gamepal_color(texture.bytes[ix]);
+            const byte = texture.bytes[ix] ?? 0;
+            const color = iw.gamepal_color(byte);
             pixel[ix * 4 + 0] = color.r;
             pixel[ix * 4 + 1] = color.g;
             pixel[ix * 4 + 2] = color.b;

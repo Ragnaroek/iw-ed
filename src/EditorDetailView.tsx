@@ -4,21 +4,26 @@ import { Texture } from "./Texture";
 
 export const EditorDetailView = (props: any) => {
   const iw = props.iw;
-  const { tileSelected, assets } = useSub(({ tileSelected, assets }) => ({
+  const { tileSelected, assets, map } = useSub(({ tileSelected, assets, map }) => ({
     tileSelected,
     assets,
+    map,
   }));
 
-  if (!tileSelected || !assets.gameDataHeaders || !assets.gameData) {
+  if (!tileSelected || !assets.gameDataHeaders || !assets.gameData || !map) {
     return <div>Nothing selected</div>;
   }
 
+  let tileOffset = tileSelected.y * 64 + tileSelected.x;
+  let wallTile = map.segs[0][tileOffset];
+  let infoTile = map.segs[1][tileOffset];
+
   const headerVertical =
-    assets.gameDataHeaders.headers[(tileSelected.tileNum - 1) * 2 + 1];
+    assets.gameDataHeaders.headers[(wallTile - 1) * 2 + 1];
   let textureDataVertical = iw.load_texture(assets.gameData, headerVertical);
 
   const headerHorizontal =
-    assets.gameDataHeaders.headers[(tileSelected.tileNum - 1) * 2];
+    assets.gameDataHeaders.headers[(wallTile - 1) * 2];
   let textureDataHorizontal = iw.load_texture(
     assets.gameData,
     headerHorizontal
@@ -27,7 +32,10 @@ export const EditorDetailView = (props: any) => {
   return (
     <Grid container>
       <Grid item xs={12}>
-        Tile: {tileSelected.tileNum}
+        Wall Tile: {wallTile}
+      </Grid>
+      <Grid item xs={12}>
+        Info Tile: {infoTile}
       </Grid>
 
       <Grid container>

@@ -10,12 +10,19 @@ export type Assets = {
   gameDataHeaders?: any;
 };
 
-export type TileSelection = { tileNum: number };
+export type Map = {
+  segs: Array<Uint16Array>, //first dimension are the planes(segs), second the map data for the plane (another Uint16Array)
+}
+
+export type TileSelection = { 
+  x: number;
+  y: number;
+};
 
 type State = {
   assets: Assets;
   //editor state
-  map?: any; //TODO better type here => how to get better types in wasm?
+  map?: Map; 
   tileSelected?: TileSelection;
 };
 const initialState: State = {

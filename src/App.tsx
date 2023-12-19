@@ -20,7 +20,7 @@ import { useSub, Store } from "./state";
 const drawerWidth = 240;
 
 function App(props: any) {
-  const { map } = useSub(({ map }) => ({ map })); //TODO Move do Editor component
+  const { map } = useSub(({ map }) => ({ map })); //TODO Move to Editor component
 
   let iw = props.iw;
 
@@ -207,6 +207,9 @@ function buildInfoPlane(gridWidth: number, map: any) {
             height={gridWidth}
             verticalAlign="middle"
             align="center"
+            onClick={() => {
+              selectTile(tile, x, y)
+            }}
           />
         );
       }
@@ -225,29 +228,39 @@ function buildWallPlane(gridWidth: number, map: any) {
     for (let x = 0; x < 64; x++) {
       let ptr = y * 64 + x;
       let tile = map.segs[0][ptr];
-      if (tile < 107) {
-        //solid wall tile
-        result.push(
-          <Rect
-            key={x + "|" + y}
-            fill="gray"
-            x={x * gridWidth}
-            y={y * gridWidth}
-            width={gridWidth}
-            height={gridWidth}
-            onClick={() =>
-              Store.set(({ tileSelected }) => ({
-                tileSelected: {
-                  tileNum: tile,
-                },
-              }))
-            }
-          />
-        );
+      let fill;
+      if (tile < 107) { //solid wall tile
+        fill = "gray"
+      } else {
+        fill = "white"
       }
+
+      result.push(
+        <Rect
+          key={x + "|" + y}
+          fill={fill}
+          x={x * gridWidth}
+          y={y * gridWidth}
+          width={gridWidth}
+          height={gridWidth}
+          onClick={() =>
+            selectTile(tile, x, y)
+          }
+        />
+      );
     }
   }
   return result;
+}
+
+function selectTile(tileNum: any, x: number, y: number) {
+  Store.set(({ tileSelected }) => ({
+    tileSelected: {
+      tileNum: tileNum,
+      x: x,
+      y: y,
+    },
+  }))
 }
 
 export default App;
