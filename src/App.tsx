@@ -212,6 +212,57 @@ function buildInfoPlane(gridWidth: number, map: any) {
             }}
           />
         );
+      } else if (tile == 124) {
+        result.push(
+          <Text
+            key={x + "|" + y}
+            text="✝"
+            x={x * gridWidth}
+            y={y * gridWidth}
+            width={gridWidth}
+            height={gridWidth}
+            verticalAlign="middle"
+            align="center"
+            onClick={() => {
+              selectTile(tile, x, y)
+            }}
+          />
+        );
+      } else if ((tile >= 134 && tile <= 141) || (tile >=170 && tile <= 177) || (tile >= 206 && tile <= 213)) {
+        // overlap with the tiles below, dogs are special enemies
+        result.push(
+          <Text
+            key={x + "|" + y}
+            text="🐕"
+            x={x * gridWidth}
+            y={y * gridWidth}
+            width={gridWidth}
+            height={gridWidth}
+            verticalAlign="middle"
+            align="center"
+            onClick={() => {
+              selectTile(tile, x, y)
+            }}
+          />
+        );
+      } else if ((tile >= 108 && tile <= 141) || (tile >= 144 && tile <= 161) 
+              || (tile >= 162 && tile <= 177) || (tile >= 180 && tile <= 195)
+              || (tile >= 198 && tile <= 213)) {
+        result.push(
+          <Text
+            key={x + "|" + y}
+            text="⌖"
+            x={x * gridWidth}
+            y={y * gridWidth}
+            width={gridWidth}
+            height={gridWidth}
+            verticalAlign="middle"
+            align="center"
+            onClick={() => {
+              selectTile(tile, x, y)
+            }}
+          />
+        );
       }
     }
   }
