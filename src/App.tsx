@@ -13,14 +13,18 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Stage, Layer, Line, Rect, Text } from "react-konva";
 import { EditorDetailView } from "./EditorDetailView";
-import { useSub, Store } from "./state";
+import { useSub, Store, TileSelection } from "./state";
+import { Stage, Layer, Line, Rect, Text } from "react-konva";
 
 const drawerWidth = 240;
 
 function App(props: any) {
-  const { map } = useSub(({ map }) => ({ map })); //TODO Move to Editor component
+  //TODO Move to Editor component
+  const { tileSelected, map } = useSub(({ tileSelected, map }) => ({
+    tileSelected,
+    map,
+  }));
 
   let iw = props.iw;
 
@@ -146,7 +150,7 @@ function App(props: any) {
         <Stage width={dim} height={dim}>
           <Layer>{buildGrid(gridWidth, dim)}</Layer>
           <Layer>{buildWallPlane(gridWidth, map)}</Layer>
-          <Layer>{buildInfoPlane(gridWidth, map)}</Layer>
+          <Layer>{buildInfoPlane(gridWidth, map, tileSelected)}</Layer>
         </Stage>
 
         <div>
@@ -185,88 +189,59 @@ function buildGrid(gridWidth: number, dim: number) {
   return result;
 }
 
-function buildInfoPlane(gridWidth: number, map: any) {
+function buildInfoPlane(gridWidth: number, map: any, tileSelected?: TileSelection) {
   if (!map) {
     return;
   }
 
-  let result = [];
+  let result : any[] = [];
   for (let y = 0; y < 64; y++) {
     for (let x = 0; x < 64; x++) {
       let ptr = y * 64 + x;
       let tile = map.segs[1][ptr];
 
-      if (tile === 19 || tile === 20 || tile === 21 || tile === 22) {
-        result.push(
-          <Text
-            key={x + "|" + y}
-            text="👨‍🦱"
-            x={x * gridWidth}
-            y={y * gridWidth}
-            width={gridWidth}
-            height={gridWidth}
-            verticalAlign="middle"
-            align="center"
-            onClick={() => {
-              selectTile(tile, x, y)
-            }}
-          />
-        );
-      } else if (tile == 124) {
-        result.push(
-          <Text
-            key={x + "|" + y}
-            text="✝"
-            x={x * gridWidth}
-            y={y * gridWidth}
-            width={gridWidth}
-            height={gridWidth}
-            verticalAlign="middle"
-            align="center"
-            onClick={() => {
-              selectTile(tile, x, y)
-            }}
-          />
-        );
-      } else if ((tile >= 134 && tile <= 141) || (tile >=170 && tile <= 177) || (tile >= 206 && tile <= 213)) {
-        // overlap with the tiles below, dogs are special enemies
-        result.push(
-          <Text
-            key={x + "|" + y}
-            text="🐕"
-            x={x * gridWidth}
-            y={y * gridWidth}
-            width={gridWidth}
-            height={gridWidth}
-            verticalAlign="middle"
-            align="center"
-            onClick={() => {
-              selectTile(tile, x, y)
-            }}
-          />
-        );
+      if(tileSelected && tileSelected.x === x && tileSelected.y === y) {
+        result.push(<Rect x={x*gridWidth} y={y*gridWidth} width={gridWidth} height={gridWidth} fill={"yellow"} />) 
+      }
+
+      if (tile === 19 || tile === 20 || tile === 21 || tile === 22) { // player start position
+        addIcon(result, '\uf007', gridWidth, x, y, tile, -(tile - 19)*90);
+      } else if (tile >= 90 && tile <= 97) { // direction tiles, East
+        addIcon(result, '\uf061', gridWidth, x, y, tile, -(tile - 90) * 45)
+      } else if (tile >= 134 && tile <= 141) { // dog, normal
+        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 134) * 45);
+      } else if (tile >=170 && tile <= 177) { // dog, medium
+        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 170) * 45);
+      } else if (tile >= 206 && tile <= 213) { // dog, hard
+        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 206) * 45);
       } else if ((tile >= 108 && tile <= 141) || (tile >= 144 && tile <= 161) 
               || (tile >= 162 && tile <= 177) || (tile >= 180 && tile <= 195)
               || (tile >= 198 && tile <= 213)) {
-        result.push(
-          <Text
-            key={x + "|" + y}
-            text="⌖"
-            x={x * gridWidth}
-            y={y * gridWidth}
-            width={gridWidth}
-            height={gridWidth}
-            verticalAlign="middle"
-            align="center"
-            onClick={() => {
-              selectTile(tile, x, y)
-            }}
-          />
-        );
+        addIcon(result, '\uf05b', gridWidth, x, y, tile);
       }
     }
   }
   return result;
+}
+
+function addIcon(result: any[], icon: string, gridWidth: number, x: number, y: number, tile: number, rotation?: number) {
+  result.push(<Text
+    rotation={rotation}
+    fontFamily="FontAwesome" 
+    key={x + "|" + y}
+    text={icon}
+    offsetX={gridWidth/2}
+    offsetY={gridWidth/2}
+    x={x * gridWidth + (gridWidth/2)}
+    y={y * gridWidth + (gridWidth/2)}
+    width={gridWidth}
+    height={gridWidth}
+    verticalAlign="middle"
+    align="center"
+    onClick={() => {
+      selectTile(tile, x, y)
+    }}
+  />);
 }
 
 function buildWallPlane(gridWidth: number, map: any) {

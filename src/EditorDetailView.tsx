@@ -32,6 +32,9 @@ export const EditorDetailView = (props: any) => {
   return (
     <Grid container>
       <Grid item xs={12}>
+        x: {tileSelected.x}, y: {tileSelected.y}
+      </Grid>
+      <Grid item xs={12}>
         Wall Tile: {wallTile}
       </Grid>
       <Grid item xs={12}>
