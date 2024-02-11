@@ -7,5 +7,5 @@ clean:
 build:
 	pnpm run build
 
-deploy: build
+deploy: clean build
 	pnpm run deploy
