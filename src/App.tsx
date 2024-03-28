@@ -204,16 +204,23 @@ function buildInfoPlane(gridWidth: number, map: any, tileSelected?: TileSelectio
         result.push(<Rect x={x*gridWidth} y={y*gridWidth} width={gridWidth} height={gridWidth} fill={"yellow"} />) 
       }
 
+      // TODO use colour code for difficulty?
       if (tile === 19 || tile === 20 || tile === 21 || tile === 22) { // player start position
         addIcon(result, '\uf007', gridWidth, x, y, tile, -(tile - 19)*90);
       } else if (tile >= 90 && tile <= 97) { // direction tiles, East
         addIcon(result, '\uf061', gridWidth, x, y, tile, -(tile - 90) * 45)
-      } else if (tile >= 134 && tile <= 141) { // dog, normal
-        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 134) * 45);
-      } else if (tile >=170 && tile <= 177) { // dog, medium
-        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 170) * 45);
-      } else if (tile >= 206 && tile <= 213) { // dog, hard
-        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 206) * 45);
+      } else if (tile >= 134 && tile <= 137) { // dog, stand, normal
+        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 134) * 90);
+      } else if (tile >= 138 && tile <= 141) { // dog, patrol, normal
+        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 138) * 90);
+      } else if (tile >=170 && tile <= 173) { // dog, stand, medium
+        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 170) * 90);
+      } else if (tile >=174 && tile <= 177) { // dog, patrol, medium
+        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 174) * 90);
+      } else if (tile >= 206 && tile <= 209) { // dog, stand, hard
+        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 206) * 90);
+      } else if (tile >= 210 && tile <= 213) { // dog, patrol, hard
+        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 210) * 90);
       } else if ((tile >= 108 && tile <= 141) || (tile >= 144 && tile <= 161) 
               || (tile >= 162 && tile <= 177) || (tile >= 180 && tile <= 195)
               || (tile >= 198 && tile <= 213)) {
