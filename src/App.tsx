@@ -2,6 +2,9 @@ import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
 import ImageIcon from "@mui/icons-material/Image";
@@ -16,14 +19,16 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { EditorDetailView } from "./EditorDetailView";
 import { useSub, Store, TileSelection } from "./state";
 import { Stage, Layer, Line, Rect, Text } from "react-konva";
+import { debug, log } from "console";
 
 const drawerWidth = 240;
 
 function App(props: any) {
   //TODO Move to Editor component
-  const { tileSelected, map } = useSub(({ tileSelected, map }) => ({
+  const { tileSelected, map, mapSelected } = useSub(({ tileSelected, map, mapSelected }) => ({
     tileSelected,
     map,
+    mapSelected,
   }));
 
   let iw = props.iw;
@@ -53,7 +58,7 @@ function App(props: any) {
       mapReader.onloadend = () => {
         let mapData = new Uint8Array(mapReader.result as ArrayBuffer);
         let headers = iw.load_map_headers(mapData, offsets);
-        let map0 = iw.load_map(mapData, headers, offsets, 0);
+        let map_loaded = iw.load_map(mapData, headers, offsets, mapSelected);
 
         Store.set(({ assets }) => {
           assets.mapOffsets = offsets;
@@ -62,7 +67,7 @@ function App(props: any) {
         });
 
         Store.set(({ map }) => ({
-          map: map0,
+          map: map_loaded,
         }));
       };
       mapReader.readAsArrayBuffer(mapFile);
@@ -137,16 +142,27 @@ function App(props: any) {
           </List>
         </Box>
       </Drawer>
-
+      
       {/* TODO find a better way than marginTop to position the main elements under the nav bar*/}
+
       <Box
-        component="main"
-        sx={{
-          bgcolor: "background.default",
-          p: 3,
-          marginTop: "60px",
-        }}
-      >
+          component="main"
+          sx={{
+            bgcolor: "background.default",
+            p: 3,
+            marginTop: "60px",
+          }}>
+        <Select value={mapSelected} onChange={selectMap}>
+          <MenuItem value={0}>1</MenuItem>
+          <MenuItem value={1}>2</MenuItem>
+          <MenuItem value={2}>3</MenuItem>
+          <MenuItem value={3}>4</MenuItem>
+          <MenuItem value={4}>5</MenuItem>
+          <MenuItem value={5}>6</MenuItem>
+          <MenuItem value={6}>7</MenuItem>
+          <MenuItem value={7}>8</MenuItem>
+        </Select>
+
         <Stage width={dim} height={dim}>
           <Layer>{buildGrid(gridWidth, dim)}</Layer>
           <Layer>{buildWallPlane(gridWidth, map)}</Layer>
@@ -162,6 +178,13 @@ function App(props: any) {
       </Box>
     </Box>
   );
+}
+
+function selectMap(e: any, newValue: any) {
+  console.log(e.target.value)
+  Store.set(({ mapSelected }) => ({
+    mapSelected: e.target.value,
+  }))
 }
 
 function buildGrid(gridWidth: number, dim: number) {

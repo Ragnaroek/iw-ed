@@ -22,11 +22,13 @@ export type TileSelection = {
 type State = {
   assets: Assets;
   //editor state
+  mapSelected: number;
   map?: Map; 
   tileSelected?: TileSelection;
 };
 const initialState: State = {
   assets: {},
+  mapSelected: 0,
   map: undefined,
   tileSelected: undefined,
 };
