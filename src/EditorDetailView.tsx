@@ -18,16 +18,11 @@ export const EditorDetailView = (props: any) => {
   let wallTile = map.segs[0][tileOffset];
   let infoTile = map.segs[1][tileOffset];
 
-  const headerVertical =
-    assets.gameDataHeaders.headers[(wallTile - 1) * 2 + 1];
-  let textureDataVertical = iw.load_texture(assets.gameData, headerVertical);
+  const headerVertical = assets.gameDataHeaders.headers[(wallTile - 1) * 2 + 1];
+  let textureDataVertical = headerVertical.length === 4096 ? iw.load_texture(assets.gameData, headerVertical) : null;
 
-  const headerHorizontal =
-    assets.gameDataHeaders.headers[(wallTile - 1) * 2];
-  let textureDataHorizontal = iw.load_texture(
-    assets.gameData,
-    headerHorizontal
-  );
+  const headerHorizontal = assets.gameDataHeaders.headers[(wallTile - 1) * 2];
+  let textureDataHorizontal = headerHorizontal.length === 4096 ? iw.load_texture(assets.gameData, headerHorizontal) : null;
 
   return (
     <Grid container>
@@ -46,7 +41,7 @@ export const EditorDetailView = (props: any) => {
           Vertical:
         </Grid>
         <Grid item xs={9}>
-          <Texture iw={iw} textureData={textureDataVertical} />
+          {textureDataVertical !== null ? <Texture iw={iw} textureData={textureDataVertical} /> : "No texture"}
         </Grid>
       </Grid>
 
@@ -55,7 +50,7 @@ export const EditorDetailView = (props: any) => {
           Horizontal:
         </Grid>
         <Grid item xs={9}>
-          <Texture iw={iw} textureData={textureDataHorizontal} />
+          {textureDataHorizontal !== null ? <Texture iw={iw} textureData={textureDataHorizontal} /> : "No texture"}
         </Grid>
       </Grid>
     </Grid>

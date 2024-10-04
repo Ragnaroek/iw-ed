@@ -1,19 +1,20 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import init, * as iw from './pkg/iw.js';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import init, * as iw from "./pkg/iw.js";
 
 async function run() {
   await init();
 
-  const elem = document.getElementById('root');
+  const elem = document.getElementById("root");
   if (elem != null) {
     const root = ReactDOM.createRoot(elem);
+    iw.init_panic_hook();
     root.render(
       <React.StrictMode>
-        <App iw={iw}/>
-      </React.StrictMode>
+        <App iw={iw} />
+      </React.StrictMode>,
     );
   }
 }
