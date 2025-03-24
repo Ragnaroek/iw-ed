@@ -11,10 +11,10 @@ export type Assets = {
 };
 
 export type Map = {
-  segs: Array<Uint16Array>, //first dimension are the planes(segs), second the map data for the plane (another Uint16Array)
-}
+  segs: Array<Uint16Array>; //first dimension are the planes(segs), second the map data for the plane (another Uint16Array)
+};
 
-export type TileSelection = { 
+export type TileSelection = {
   x: number;
   y: number;
 };
@@ -23,12 +23,14 @@ type State = {
   assets: Assets;
   //editor state
   mapSelected: number;
-  map?: Map; 
+  episodeSelected: number;
+  map?: Map;
   tileSelected?: TileSelection;
 };
 const initialState: State = {
   assets: {},
   mapSelected: 0,
+  episodeSelected: 1,
   map: undefined,
   tileSelected: undefined,
 };

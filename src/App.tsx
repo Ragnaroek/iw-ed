@@ -4,7 +4,6 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
 import ImageIcon from "@mui/icons-material/Image";
@@ -19,16 +18,16 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { EditorDetailView } from "./EditorDetailView";
 import { useSub, Store, TileSelection } from "./state";
 import { Stage, Layer, Line, Rect, Text } from "react-konva";
-import { debug, log } from "console";
 
 const drawerWidth = 240;
 
 function App(props: any) {
   //TODO Move to Editor component
-  const { tileSelected, map, mapSelected } = useSub(({ tileSelected, map, mapSelected }) => ({
+  const { tileSelected, map, mapSelected, episodeSelected } = useSub(({ tileSelected, map, mapSelected, episodeSelected }) => ({
     tileSelected,
     map,
     mapSelected,
+    episodeSelected,
   }));
 
   let iw = props.iw;
@@ -58,7 +57,7 @@ function App(props: any) {
       mapReader.onloadend = () => {
         let mapData = new Uint8Array(mapReader.result as ArrayBuffer);
         let headers = iw.load_map_headers(mapData, offsets);
-        let map_loaded = iw.load_map(mapData, headers, offsets, mapSelected);
+        let map_loaded = iw.load_map(mapData, headers, offsets, mapSelected + episodeSelected * 10);
 
         Store.set(({ assets }) => {
           assets.mapOffsets = offsets;
@@ -91,10 +90,7 @@ function App(props: any) {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      >
+      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
             IW-ED
@@ -142,25 +138,36 @@ function App(props: any) {
           </List>
         </Box>
       </Drawer>
-      
+
       {/* TODO find a better way than marginTop to position the main elements under the nav bar*/}
 
       <Box
-          component="main"
-          sx={{
-            bgcolor: "background.default",
-            p: 3,
-            marginTop: "60px",
-          }}>
+        component="main"
+        sx={{
+          bgcolor: "background.default",
+          p: 3,
+          marginTop: "60px",
+        }}
+      >
+        <Select value={episodeSelected} onChange={selectEpisode}>
+          <MenuItem value={0}>Episode 1</MenuItem>
+          <MenuItem value={1}>Episode 2</MenuItem>
+          <MenuItem value={2}>Episode 3</MenuItem>
+          <MenuItem value={3}>Episode 4</MenuItem>
+          <MenuItem value={4}>Episode 5</MenuItem>
+          <MenuItem value={5}>Episode 6</MenuItem>
+        </Select>
         <Select value={mapSelected} onChange={selectMap}>
-          <MenuItem value={0}>1</MenuItem>
-          <MenuItem value={1}>2</MenuItem>
-          <MenuItem value={2}>3</MenuItem>
-          <MenuItem value={3}>4</MenuItem>
-          <MenuItem value={4}>5</MenuItem>
-          <MenuItem value={5}>6</MenuItem>
-          <MenuItem value={6}>7</MenuItem>
-          <MenuItem value={7}>8</MenuItem>
+          <MenuItem value={0}>M1</MenuItem>
+          <MenuItem value={1}>M2</MenuItem>
+          <MenuItem value={2}>M3</MenuItem>
+          <MenuItem value={3}>M4</MenuItem>
+          <MenuItem value={4}>M5</MenuItem>
+          <MenuItem value={5}>M6</MenuItem>
+          <MenuItem value={6}>M7</MenuItem>
+          <MenuItem value={7}>M8</MenuItem>
+          <MenuItem value={8}>M9</MenuItem>
+          <MenuItem value={9}>M10</MenuItem>
         </Select>
 
         <Stage width={dim} height={dim}>
@@ -180,34 +187,25 @@ function App(props: any) {
   );
 }
 
+function selectEpisode(e: any, newValue: any) {
+  Store.set(({ episodeSelected }) => ({
+    episodeSelected: e.target.value,
+  }));
+}
+
 function selectMap(e: any, newValue: any) {
-  console.log(e.target.value)
   Store.set(({ mapSelected }) => ({
     mapSelected: e.target.value,
-  }))
+  }));
 }
 
 function buildGrid(gridWidth: number, dim: number) {
   let result = [];
   for (let x = 0; x <= 64; x++) {
-    result.push(
-      <Line
-        key={"x" + x}
-        points={[x * gridWidth, 0, x * gridWidth, dim]}
-        strokeWidth={1}
-        stroke="#f2f2f2"
-      />
-    );
+    result.push(<Line key={"x" + x} points={[x * gridWidth, 0, x * gridWidth, dim]} strokeWidth={1} stroke="#f2f2f2" />);
   }
   for (let y = 0; y <= 64; y++) {
-    result.push(
-      <Line
-        key={"y" + y}
-        points={[0, y * gridWidth, dim, y * gridWidth]}
-        strokeWidth={1}
-        stroke="#f2f2f2"
-      />
-    );
+    result.push(<Line key={"y" + y} points={[0, y * gridWidth, dim, y * gridWidth]} strokeWidth={1} stroke="#f2f2f2" />);
   }
   return result;
 }
@@ -217,37 +215,49 @@ function buildInfoPlane(gridWidth: number, map: any, tileSelected?: TileSelectio
     return;
   }
 
-  let result : any[] = [];
+  let result: any[] = [];
   for (let y = 0; y < 64; y++) {
     for (let x = 0; x < 64; x++) {
       let ptr = y * 64 + x;
       let tile = map.segs[1][ptr];
 
-      if(tileSelected && tileSelected.x === x && tileSelected.y === y) {
-        result.push(<Rect x={x*gridWidth} y={y*gridWidth} width={gridWidth} height={gridWidth} fill={"yellow"} />) 
+      if (tileSelected && tileSelected.x === x && tileSelected.y === y) {
+        result.push(<Rect x={x * gridWidth} y={y * gridWidth} width={gridWidth} height={gridWidth} fill={"yellow"} />);
       }
 
       // TODO use colour code for difficulty?
-      if (tile === 19 || tile === 20 || tile === 21 || tile === 22) { // player start position
-        addIcon(result, '\uf007', gridWidth, x, y, tile, -(tile - 19)*90);
-      } else if (tile >= 90 && tile <= 97) { // direction tiles, East
-        addIcon(result, '\uf061', gridWidth, x, y, tile, -(tile - 90) * 45)
-      } else if (tile >= 134 && tile <= 137) { // dog, stand, normal
-        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 134) * 90);
-      } else if (tile >= 138 && tile <= 141) { // dog, patrol, normal
-        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 138) * 90);
-      } else if (tile >=170 && tile <= 173) { // dog, stand, medium
-        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 170) * 90);
-      } else if (tile >=174 && tile <= 177) { // dog, patrol, medium
-        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 174) * 90);
-      } else if (tile >= 206 && tile <= 209) { // dog, stand, hard
-        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 206) * 90);
-      } else if (tile >= 210 && tile <= 213) { // dog, patrol, hard
-        addIcon(result, '\uf6d3', gridWidth, x, y, tile, -(tile - 210) * 90);
-      } else if ((tile >= 108 && tile <= 141) || (tile >= 144 && tile <= 161) 
-              || (tile >= 162 && tile <= 177) || (tile >= 180 && tile <= 195)
-              || (tile >= 198 && tile <= 213)) {
-        addIcon(result, '\uf05b', gridWidth, x, y, tile);
+      if (tile === 19 || tile === 20 || tile === 21 || tile === 22) {
+        // player start position
+        addIcon(result, "\uf007", gridWidth, x, y, tile, -(tile - 19) * 90);
+      } else if (tile >= 90 && tile <= 97) {
+        // direction tiles, East
+        addIcon(result, "\uf061", gridWidth, x, y, tile, -(tile - 90) * 45);
+      } else if (tile >= 134 && tile <= 137) {
+        // dog, stand, normal
+        addIcon(result, "\uf6d3", gridWidth, x, y, tile, -(tile - 134) * 90);
+      } else if (tile >= 138 && tile <= 141) {
+        // dog, patrol, normal
+        addIcon(result, "\uf6d3", gridWidth, x, y, tile, -(tile - 138) * 90);
+      } else if (tile >= 170 && tile <= 173) {
+        // dog, stand, medium
+        addIcon(result, "\uf6d3", gridWidth, x, y, tile, -(tile - 170) * 90);
+      } else if (tile >= 174 && tile <= 177) {
+        // dog, patrol, medium
+        addIcon(result, "\uf6d3", gridWidth, x, y, tile, -(tile - 174) * 90);
+      } else if (tile >= 206 && tile <= 209) {
+        // dog, stand, hard
+        addIcon(result, "\uf6d3", gridWidth, x, y, tile, -(tile - 206) * 90);
+      } else if (tile >= 210 && tile <= 213) {
+        // dog, patrol, hard
+        addIcon(result, "\uf6d3", gridWidth, x, y, tile, -(tile - 210) * 90);
+      } else if (
+        (tile >= 108 && tile <= 141) ||
+        (tile >= 144 && tile <= 161) ||
+        (tile >= 162 && tile <= 177) ||
+        (tile >= 180 && tile <= 195) ||
+        (tile >= 198 && tile <= 213)
+      ) {
+        addIcon(result, "\uf05b", gridWidth, x, y, tile);
       }
     }
   }
@@ -255,23 +265,25 @@ function buildInfoPlane(gridWidth: number, map: any, tileSelected?: TileSelectio
 }
 
 function addIcon(result: any[], icon: string, gridWidth: number, x: number, y: number, tile: number, rotation?: number) {
-  result.push(<Text
-    rotation={rotation}
-    fontFamily="FontAwesome" 
-    key={x + "|" + y}
-    text={icon}
-    offsetX={gridWidth/2}
-    offsetY={gridWidth/2}
-    x={x * gridWidth + (gridWidth/2)}
-    y={y * gridWidth + (gridWidth/2)}
-    width={gridWidth}
-    height={gridWidth}
-    verticalAlign="middle"
-    align="center"
-    onClick={() => {
-      selectTile(tile, x, y)
-    }}
-  />);
+  result.push(
+    <Text
+      rotation={rotation}
+      fontFamily="FontAwesome"
+      key={x + "|" + y}
+      text={icon}
+      offsetX={gridWidth / 2}
+      offsetY={gridWidth / 2}
+      x={x * gridWidth + gridWidth / 2}
+      y={y * gridWidth + gridWidth / 2}
+      width={gridWidth}
+      height={gridWidth}
+      verticalAlign="middle"
+      align="center"
+      onClick={() => {
+        selectTile(tile, x, y);
+      }}
+    />,
+  );
 }
 
 function buildWallPlane(gridWidth: number, map: any) {
@@ -285,10 +297,11 @@ function buildWallPlane(gridWidth: number, map: any) {
       let ptr = y * 64 + x;
       let tile = map.segs[0][ptr];
       let fill;
-      if (tile < 107) { //solid wall tile
-        fill = "gray"
+      if (tile < 107) {
+        //solid wall tile
+        fill = "gray";
       } else {
-        fill = "white"
+        fill = "white";
       }
 
       result.push(
@@ -299,10 +312,8 @@ function buildWallPlane(gridWidth: number, map: any) {
           y={y * gridWidth}
           width={gridWidth}
           height={gridWidth}
-          onClick={() =>
-            selectTile(tile, x, y)
-          }
-        />
+          onClick={() => selectTile(tile, x, y)}
+        />,
       );
     }
   }
@@ -316,7 +327,7 @@ function selectTile(tileNum: any, x: number, y: number) {
       x: x,
       y: y,
     },
-  }))
+  }));
 }
 
 export default App;
