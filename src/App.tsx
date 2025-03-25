@@ -226,9 +226,13 @@ function buildInfoPlane(gridWidth: number, map: any, tileSelected?: TileSelectio
       }
 
       // TODO use colour code for difficulty?
-      if (tile === 19 || tile === 20 || tile === 21 || tile === 22) {
+      if (tile === 0) {
+        // ignore not set tile
+      } else if (tile === 19 || tile === 20 || tile === 21 || tile === 22) {
         // player start position
         addIcon(result, "\uf007", gridWidth, x, y, tile, -(tile - 19) * 90);
+      } else if (tile >= 23 && tile <= 74) {
+        addIcon(result, "\uf0d8", gridWidth, x, y, tile, -(tile - 23) * 90);
       } else if (tile >= 90 && tile <= 97) {
         // direction tiles, East
         addIcon(result, "\uf061", gridWidth, x, y, tile, -(tile - 90) * 45);
@@ -250,6 +254,9 @@ function buildInfoPlane(gridWidth: number, map: any, tileSelected?: TileSelectio
       } else if (tile >= 210 && tile <= 213) {
         // dog, patrol, hard
         addIcon(result, "\uf6d3", gridWidth, x, y, tile, -(tile - 210) * 90);
+      } else if (tile >= 216 && tile <= 219) {
+        // mutant
+        addIcon(result, "\uf780", gridWidth, x, y, tile, -(tile - 216) * 90);
       } else if (
         (tile >= 108 && tile <= 141) ||
         (tile >= 144 && tile <= 161) ||
@@ -258,6 +265,8 @@ function buildInfoPlane(gridWidth: number, map: any, tileSelected?: TileSelectio
         (tile >= 198 && tile <= 213)
       ) {
         addIcon(result, "\uf05b", gridWidth, x, y, tile);
+      } else {
+        console.log("!! non mapped icon: " + tile);
       }
     }
   }
